@@ -9,11 +9,11 @@ import (
 )
 
 const (
-	inputFile = "input2.txt"
+	inputFile = "input.txt"
 )
 
 func main() {
-	var depth, hPos int
+	var aim, depth, hPos int
 
 	file, err := os.Open(inputFile)
 	if err != nil {
@@ -33,18 +33,18 @@ func main() {
 
 		switch command[0] {
 		case "up":
-			depth = depth - value
+			aim = aim - value
 		case "down":
-			depth = depth + value
+			aim = aim + value
 		case "forward":
 			hPos = hPos + value
+			depth = depth + aim*value
 		default:
 			panic("no idea what's going on")
 		}
 	}
 
-	log.Println("Part One")
-	log.Printf("  Horizontal Position: %d", hPos)
-	log.Printf("  Depth: %d", depth)
-	log.Printf("  Multiplied Together: %d", depth*hPos)
+	log.Printf("Horizontal Position: %d", hPos)
+	log.Printf("Depth: %d", depth)
+	log.Printf("Multiplied Together: %d", depth*hPos)
 }
