@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"log"
 	"os"
 	"strconv"
 
@@ -33,21 +32,11 @@ func main() {
 		bitStrings = append(bitStrings, bitString)
 
 		if bitCount == nil {
-			log.Println("initializing bitCount")
 			bitCount = make([]int, len(bitString))
 			stringLen = len(bitString)
 		}
 
-		for i := 0; i < len(bitString); i++ {
-			switch bitString[i : i+1] {
-			case "0":
-				bitCount[i]--
-			case "1":
-				bitCount[i]++
-			default:
-				panic("something's wrong")
-			}
-		}
+		incrDecrBitCounts(bitString, &bitCount)
 	}
 
 	var gamma string
@@ -75,146 +64,87 @@ func main() {
 
 	oxStrings := bitStrings
 	oxBitCount := bitCount
-
-	for i := 0; i < stringLen; i++ {
-		log.Println("oxStrings is equal to...")
-		log.Println(oxStrings)
-
-		if i > 0 {
-			oxBitCount = nil
-
-			for _, os := range oxStrings {
-				if oxBitCount == nil {
-					oxBitCount = make([]int, len(os))
-				}
-
-				for j := 0; j < len(os); j++ {
-					switch os[j : j+1] {
-					case "0":
-						oxBitCount[j]--
-					case "1":
-						oxBitCount[j]++
-					default:
-						panic("something's wrong")
-					}
-				}
-			}
-		}
-
-		ox := []string{}
-
-		switch {
-		case oxBitCount[i] > 0:
-			for k := range oxStrings {
-				if oxStrings[k][i:i+1] == "1" {
-					if len(oxStrings) > 1 {
-						ox = append(ox, oxStrings[k])
-					}
-				}
-			}
-		case oxBitCount[i] < 0:
-			for k := range oxStrings {
-				if oxStrings[k][i:i+1] == "0" {
-					if len(oxStrings) > 1 {
-						ox = append(ox, oxStrings[k])
-					}
-				}
-			}
-		case oxBitCount[i] == 0:
-			for k := range oxStrings {
-				if oxStrings[k][i:i+1] == "1" {
-					if len(oxStrings) > 1 {
-						ox = append(ox, oxStrings[k])
-					}
-				}
-			}
-		}
-
-		log.Println("ox is equal to...")
-		log.Println(ox)
-
-		if len(ox) > 0 {
-			oxStrings = sliceutil.IntersectStrings(oxStrings, ox)
-		}
-
-		log.Println("oxStrings is now equal to...")
-		log.Println(oxStrings)
-		log.Println("")
-	}
-
 	co2Strings := bitStrings
 	co2BitCount := bitCount
 
 	for i := 0; i < stringLen; i++ {
-		log.Println("co2Strings is equal to...")
-		log.Println(co2Strings)
-
+		// already have counts for first iteration, so skip it
 		if i > 0 {
-			co2BitCount = nil
+			oxBitCount = make([]int, stringLen)
+			for _, os := range oxStrings {
+				incrDecrBitCounts(os, &oxBitCount)
+			}
 
+			co2BitCount = make([]int, stringLen)
 			for _, cs := range co2Strings {
-				if co2BitCount == nil {
-					co2BitCount = make([]int, len(cs))
-				}
-
-				for j := 0; j < len(cs); j++ {
-					switch cs[j : j+1] {
-					case "0":
-						co2BitCount[j]--
-					case "1":
-						co2BitCount[j]++
-					default:
-						panic("something's wrong")
-					}
-				}
+				incrDecrBitCounts(cs, &co2BitCount)
 			}
 		}
 
+		ox := []string{}
 		co2 := []string{}
 
+		var oxValue string
+		var co2Value string
+
+		switch {
+		case oxBitCount[i] > 0:
+			oxValue = "1"
+		case oxBitCount[i] < 0:
+			oxValue = "0"
+		case oxBitCount[i] == 0:
+			oxValue = "1"
+		}
 		switch {
 		case co2BitCount[i] > 0:
-			for k := range co2Strings {
-				if co2Strings[k][i:i+1] == "0" {
-					if len(co2Strings) > 1 {
-						co2 = append(co2, co2Strings[k])
-					}
-				}
-			}
+			co2Value = "0"
 		case co2BitCount[i] < 0:
-			for k := range co2Strings {
-				if co2Strings[k][i:i+1] == "1" {
-					if len(co2Strings) > 1 {
-						co2 = append(co2, co2Strings[k])
-					}
-				}
-			}
+			co2Value = "1"
 		case co2BitCount[i] == 0:
-			for k := range co2Strings {
-				if co2Strings[k][i:i+1] == "0" {
-					if len(co2Strings) > 1 {
-						co2 = append(co2, co2Strings[k])
-					}
+			co2Value = "0"
+		}
+
+		for k := range oxStrings {
+			if oxStrings[k][i:i+1] == oxValue {
+				if len(oxStrings) > 1 {
+					ox = append(ox, oxStrings[k])
 				}
 			}
 		}
 
-		log.Println("co2 is equal to...")
-		log.Println(co2)
+		for k := range co2Strings {
+			if co2Strings[k][i:i+1] == co2Value {
+				if len(co2Strings) > 1 {
+					co2 = append(co2, co2Strings[k])
+				}
+			}
+		}
 
+		if len(ox) > 0 {
+			oxStrings = sliceutil.IntersectStrings(oxStrings, ox)
+		}
 		if len(co2) > 0 {
 			co2Strings = sliceutil.IntersectStrings(co2Strings, co2)
 		}
-
-		log.Println("co2Strings is now equal to...")
-		log.Println(co2Strings)
-		log.Println("")
 	}
 
 	oxDec, err := strconv.ParseInt(oxStrings[0], 2, 64)
 	co2Dec, err := strconv.ParseInt(co2Strings[0], 2, 64)
 
-	fmt.Printf("oxygen: %s (%d)\n", oxStrings[0], oxDec)
+	fmt.Printf("\noxygen: %s (%d)\n", oxStrings[0], oxDec)
 	fmt.Printf("co2: %s (%d)\n", co2Strings[0], co2Dec)
 	fmt.Printf("multiplied: %d\n", oxDec*co2Dec)
+}
+
+func incrDecrBitCounts(s string, count *[]int) {
+	for i := 0; i < len(s); i++ {
+		switch s[i : i+1] {
+		case "0":
+			(*count)[i]--
+		case "1":
+			(*count)[i]++
+		default:
+			panic("something's wrong")
+		}
+	}
 }
