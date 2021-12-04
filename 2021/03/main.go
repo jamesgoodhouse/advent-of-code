@@ -13,8 +13,6 @@ const (
 	inputFile = "input.txt"
 )
 
-// GROSSEST CODE EVER WRITTEN.
-
 func main() {
 	var stringLen int
 	var bitCount []int
