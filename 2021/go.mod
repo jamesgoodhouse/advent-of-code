@@ -1,4 +1,4 @@
-module github.com/jamesgoodhouse/advent-of-code/2021/03
+module github.com/jamesgoodhouse/advent-of-code/2021
 
 go 1.17
 
