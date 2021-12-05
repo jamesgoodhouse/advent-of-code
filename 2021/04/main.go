@@ -14,7 +14,7 @@ const (
 
 type (
 	board struct {
-		numbers                  [][]string
+		numbers                  [][]int
 		matches                  [][]bool
 		rowCounters, colCounters []int
 	}
@@ -22,10 +22,10 @@ type (
 
 func newBoard() *board {
 	b := &board{}
-	b.numbers = make([][]string, 5)
+	b.numbers = make([][]int, 5)
 	b.matches = make([][]bool, 5)
 	for i := range b.numbers {
-		b.numbers[i] = make([]string, 5)
+		b.numbers[i] = make([]int, 5)
 		b.matches[i] = make([]bool, 5)
 		b.rowCounters = make([]int, 5)
 		b.colCounters = make([]int, 5)
@@ -42,7 +42,7 @@ func main() {
 
 	scanner := bufio.NewScanner(file)
 
-	var numbers []string
+	numbers := []int{}
 	inputLine := 0
 
 	boardLines := 0
@@ -55,12 +55,24 @@ func main() {
 		text := scanner.Text()
 
 		if inputLine == 0 {
-			numbers = strings.Split(text, ",")
+			for _, numRaw := range strings.Split(text, ",") {
+				n, err := strconv.Atoi(numRaw)
+				if err != nil {
+					panic("not a number")
+				}
+				numbers = append(numbers, n)
+			}
 		} else if text != "" {
 			if b == nil {
 				b = newBoard()
 			}
-			b.numbers[boardLines] = strings.Fields(text)
+			for i, numRaw := range strings.Fields(text) {
+				n, err := strconv.Atoi(numRaw)
+				if err != nil {
+					panic("not a number")
+				}
+				b.numbers[boardLines][i] = n
+			}
 			boardLines++
 		}
 
@@ -88,18 +100,14 @@ func sumUnmarkedNums(b *board) int {
 	for i := range b.matches {
 		for j := range b.matches[i] {
 			if !b.matches[i][j] {
-				n, err := strconv.Atoi(b.numbers[i][j])
-				if err != nil {
-					panic("something broke")
-				}
-				sum += n
+				sum += b.numbers[i][j]
 			}
 		}
 	}
 	return sum
 }
 
-func runBingo(numbers []string, boards []*board) (*board, *int) {
+func runBingo(numbers []int, boards []*board) (*board, *int) {
 	for _, n := range numbers {
 		for _, b := range boards {
 			for bRowNum := 0; bRowNum < 5; bRowNum++ {
@@ -109,11 +117,7 @@ func runBingo(numbers []string, boards []*board) (*board, *int) {
 						b.rowCounters[bRowNum]++
 						b.colCounters[bColNum]++
 						if b.rowCounters[bRowNum] == 5 || b.colCounters[bColNum] == 5 {
-							winNum, err := strconv.Atoi(n)
-							if err != nil {
-								panic("something broke")
-							}
-							return b, &winNum
+							return b, &n
 						}
 					}
 				}
