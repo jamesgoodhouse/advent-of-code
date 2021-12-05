@@ -17,6 +17,12 @@ type (
 		numbers                  [][]int
 		matches                  [][]bool
 		rowCounters, colCounters []int
+		won                      bool
+		winningNumber            int
+	}
+
+	winningBoards struct {
+		boards []*board
 	}
 )
 
@@ -85,14 +91,14 @@ func main() {
 		inputLine++
 	}
 
-	winningBoard, winningNumber := runBingo(numbers, boards)
-	if winningBoard == nil {
-		panic("no winning board found")
-	}
+	winBoards := runBingo(numbers, boards)
 
-	sum := sumUnmarkedNums(winningBoard)
+	firstWinBoard := winBoards.boards[0]
+	fmt.Println(sumUnmarkedNums(firstWinBoard) * firstWinBoard.winningNumber)
 
-	fmt.Println(sum * *winningNumber)
+	lastWinBoard := winBoards.boards[len(winBoards.boards)-1]
+	fmt.Println(sumUnmarkedNums(lastWinBoard) * lastWinBoard.winningNumber)
+
 }
 
 func sumUnmarkedNums(b *board) int {
@@ -107,17 +113,23 @@ func sumUnmarkedNums(b *board) int {
 	return sum
 }
 
-func runBingo(numbers []int, boards []*board) (*board, *int) {
+func runBingo(numbers []int, boards []*board) *winningBoards {
+	winBoards := &winningBoards{}
+
 	for _, n := range numbers {
 		for _, b := range boards {
-			for bRowNum := 0; bRowNum < 5; bRowNum++ {
-				for bColNum := 0; bColNum < 5; bColNum++ {
-					if b.numbers[bRowNum][bColNum] == n {
-						b.matches[bRowNum][bColNum] = true
-						b.rowCounters[bRowNum]++
-						b.colCounters[bColNum]++
-						if b.rowCounters[bRowNum] == 5 || b.colCounters[bColNum] == 5 {
-							return b, &n
+			if !b.won {
+				for bRowNum := 0; bRowNum < 5; bRowNum++ {
+					for bColNum := 0; bColNum < 5; bColNum++ {
+						if b.numbers[bRowNum][bColNum] == n {
+							b.matches[bRowNum][bColNum] = true
+							b.rowCounters[bRowNum]++
+							b.colCounters[bColNum]++
+							if b.rowCounters[bRowNum] == 5 || b.colCounters[bColNum] == 5 {
+								b.won = true
+								b.winningNumber = n
+								winBoards.boards = append(winBoards.boards, b)
+							}
 						}
 					}
 				}
@@ -125,5 +137,5 @@ func runBingo(numbers []int, boards []*board) (*board, *int) {
 		}
 	}
 
-	return nil, nil
+	return winBoards
 }
