@@ -13,9 +13,13 @@ const (
 )
 
 type (
+	boardNumber struct {
+		number int
+		called bool
+	}
+
 	board struct {
-		numbers                  [][]int
-		matches                  [][]bool
+		numbers                  [][]*boardNumber
 		rowCounters, colCounters []int
 		won                      bool
 		winningNumber            int
@@ -28,11 +32,9 @@ type (
 
 func newBoard() *board {
 	b := &board{}
-	b.numbers = make([][]int, 5)
-	b.matches = make([][]bool, 5)
+	b.numbers = make([][]*boardNumber, 5)
 	for i := range b.numbers {
-		b.numbers[i] = make([]int, 5)
-		b.matches[i] = make([]bool, 5)
+		b.numbers[i] = make([]*boardNumber, 5)
 		b.rowCounters = make([]int, 5)
 		b.colCounters = make([]int, 5)
 	}
@@ -77,7 +79,7 @@ func main() {
 				if err != nil {
 					panic("not a number")
 				}
-				b.numbers[boardLines][i] = n
+				b.numbers[boardLines][i] = &boardNumber{number: n}
 			}
 			boardLines++
 		}
@@ -103,10 +105,10 @@ func main() {
 
 func sumUnmarkedNums(b *board) int {
 	sum := 0
-	for i := range b.matches {
-		for j := range b.matches[i] {
-			if !b.matches[i][j] {
-				sum += b.numbers[i][j]
+	for i := range b.numbers {
+		for j := range b.numbers[i] {
+			if !b.numbers[i][j].called {
+				sum += b.numbers[i][j].number
 			}
 		}
 	}
@@ -121,8 +123,8 @@ func runBingo(numbers []int, boards []*board) *winningBoards {
 			if !b.won {
 				for bRowNum := 0; bRowNum < 5; bRowNum++ {
 					for bColNum := 0; bColNum < 5; bColNum++ {
-						if b.numbers[bRowNum][bColNum] == n {
-							b.matches[bRowNum][bColNum] = true
+						if b.numbers[bRowNum][bColNum].number == n {
+							b.numbers[bRowNum][bColNum].called = true
 							b.rowCounters[bRowNum]++
 							b.colCounters[bColNum]++
 							if b.rowCounters[bRowNum] == 5 || b.colCounters[bColNum] == 5 {
