@@ -11,27 +11,17 @@ import (
 const (
 	inputFile               = "input.txt"
 	defaultLanternfishTimer = 8
-	lanterfishTimerReset    = 6
-	daysOfSpawning          = 80
+	lanternfishTimerReset   = 6
+	daysOfSpawning          = 256
 )
 
 var (
-	fish = lanternfishes{}
+	fish lanternfishes
 )
 
 type (
-	lanternfish struct{ timer int }
-
-	lanternfishes []*lanternfish
+	lanternfishes []int
 )
-
-func newLanternfish(timer int) *lanternfish {
-	return &lanternfish{timer: timer}
-}
-
-func (lf *lanternfish) createNewLaternfish() *lanternfish {
-	return &lanternfish{timer: defaultLanternfishTimer}
-}
 
 func main() {
 	file, err := os.Open(inputFile)
@@ -45,33 +35,35 @@ func main() {
 	for scanner.Scan() {
 		text := scanner.Text()
 
+		fish = make([]int, defaultLanternfishTimer+1)
+
 		for _, timerRaw := range strings.Split(text, ",") {
 			timer, err := strconv.Atoi(timerRaw)
 			if err != nil {
 				panic(err)
 			}
-			fish = append(fish, &lanternfish{timer: timer})
+			fish[timer]++
 		}
 	}
 
 	fish.spawn()
 
-	fmt.Printf("number of lanternfish: '%d'\n", len(fish))
+	fmt.Printf("number of lanternfish: '%d'\n", fish.count())
+}
+
+func (lfs *lanternfishes) count() int {
+	count := 0
+	for _, lf := range *lfs {
+		count += lf
+	}
+	return count
 }
 
 func (lf *lanternfishes) spawn() {
 	for day := 0; day < daysOfSpawning; day++ {
-		for _, f := range *lf {
-			if f.timer == 0 {
-				f.timer = 6
-				fish = append(fish, &lanternfish{timer: defaultLanternfishTimer})
-			} else if f.timer < 0 {
-				panic("uhh...")
-			} else {
-				f.timer--
-			}
-		}
-
-		fmt.Printf("day %d: %d\n", day, len(fish))
+		zeroFish := fish[0]
+		fish = fish[1:]
+		fish[lanternfishTimerReset] += zeroFish
+		fish = append(fish, zeroFish)
 	}
 }
