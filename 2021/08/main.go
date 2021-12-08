@@ -115,24 +115,17 @@ const (
 //  F
 // TFTFFTF
 
-var numberSegmentCounts = map[int]int{
-	1: 2,
-	4: 4,
-	7: 3,
-	8: 7,
-}
-
-var numberSegments = map[int][]bool{
-	0: {true, true, true, false, true, true, true},
-	1: {false, false, true, false, false, true, false},
-	2: {true, false, true, true, true, false, true},
-	3: {true, false, true, true, false, true, true},
-	4: {false, true, true, true, false, true, false},
-	5: {true, true, false, true, false, true, true},
-	6: {true, true, false, true, true, true, true},
-	7: {true, false, true, false, false, true, false},
-	8: {true, true, true, true, true, true, true},
-	9: {true, true, true, true, false, true, true},
+var numberSegmentShapes = [][]bool{
+	{true, true, true, false, true, true, true},
+	{false, false, true, false, false, true, false},
+	{true, false, true, true, true, false, true},
+	{true, false, true, true, false, true, true},
+	{false, true, true, true, false, true, false},
+	{true, true, false, true, false, true, true},
+	{true, true, false, true, true, true, true},
+	{true, false, true, false, false, true, false},
+	{true, true, true, true, true, true, true},
+	{true, true, true, true, false, true, true},
 }
 
 func main() {
@@ -149,57 +142,70 @@ func main() {
 
 		segmentsRaw := strings.Split(t, " | ")
 
-		// signalPatterns := strings.Fields(segmentsRaw[0])
-		outputs := strings.Fields(segmentsRaw[1])
+		signalPatterns := strings.Fields(segmentsRaw[0])
+		// outputs := strings.Fields(segmentsRaw[1])
 
-		knownNumberSegments := map[int]string{}
-
-		for _, output := range outputs {
-			// output := strings.Split(outputString, "")
-			switch {
-			case len(output) == numberSegmentCounts[1]:
-				knownNumberSegments[1] = output
-			case len(output) == numberSegmentCounts[4]:
-				knownNumberSegments[4] = output
-			case len(output) == numberSegmentCounts[7]:
-				knownNumberSegments[7] = output
-			case len(output) == numberSegmentCounts[8]:
-				knownNumberSegments[8] = output
-			}
-		}
-
+		segments := []string{}
 		permsOf8 := map[string]map[string]int{}
-		Perm([]rune(knownNumberSegments[8]), func(a []rune) {
-			permsOf8[string(a)] = make(map[string]int)
-			for i, v := range strings.Split(string(a), "") {
-				permsOf8[string(a)][v] = i
-			}
-		})
 
-		for k, v := range knownNumberSegments {
-			if k != 8 {
-				var found bool
-				fmt.Printf("checking number '%d' with segements '%s'\n", k, v)
-				for _, p8 := range permsOf8 {
-					knownNumber := make([]bool, 7)
-					for _, taco := range strings.Split(v, "") {
-						knownNumber[p8[taco]] = true
+		for _, sp := range signalPatterns {
+			if len(sp) == 7 {
+				Perm([]rune(sp), func(a []rune) {
+					permsOf8[string(a)] = make(map[string]int)
+					for i, v := range strings.Split(string(a), "") {
+						permsOf8[string(a)][v] = i
 					}
-
-					if reflect.DeepEqual(numberSegments[k], knownNumber) {
-						fmt.Printf("permutation of '8' that fits '%d': %v\n", k, p8)
-						fmt.Println(knownNumber)
-						fmt.Println(numberSegments[k])
-						found = true
-						// break
-					}
-				}
-				if !found {
-					fmt.Printf("no fit found for '%d' :-(\n", k)
-				}
-				fmt.Println("--------------------")
+				})
+			} else {
+				segments = append(segments, sp)
 			}
 		}
+
+		knownSegments := make([]string, 10)
+
+		segmentIterator := 0
+
+		fmt.Println(len(segments))
+		for {
+			segment := segments[segmentIterator]
+
+			fmt.Printf("checking segement '%s'\n", segment)
+
+			found := false
+
+			for _, p8 := range permsOf8 {
+				numberShape := make([]bool, 7)
+
+				for _, s := range strings.Split(segment, "") {
+					numberShape[p8[s]] = true
+				}
+
+				for n, ns := range numberSegmentShapes {
+					if n != 8 && reflect.DeepEqual(ns, numberShape) && knownSegments[n] == "" {
+						fmt.Printf("found match for '%d'\n", n)
+						knownSegments[n] = segment
+						found = true
+						break
+					}
+				}
+				if found {
+					// stop looking through permutations if match found
+					break
+				}
+			}
+			if !found {
+				segmentIterator = 0
+				knownSegments = make([]string, 10)
+			} else {
+				segmentIterator++
+			}
+
+			if segmentIterator == 9 {
+				break
+			}
+		}
+
+		fmt.Println(knownSegments)
 	}
 }
 
