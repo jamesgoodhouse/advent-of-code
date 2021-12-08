@@ -33,6 +33,79 @@ var (
 		9: {[]string{"a", "b", "c", "d", "f", "g"}},
 	}
 
+	// 8       5     2     3     7   9      6      4    0      1  | 5     3     5     3
+	// acedgfb cdfbe gcdfa fbcad dab cefabd cdfgeb eafb cagedb ab | cdfeb fcadb cdfeb cdbaf
+
+	//   0:      1:      2:      3:      4:
+	//  aaaa    ....    aaaa    aaaa    ....
+	// b    c  .    c  .    c  .    c  b    c
+	// b    c  .    c  .    c  .    c  b    c
+	//  ....    ....    dddd    dddd    dddd
+	// e    f  .    f  e    .  .    f  .    f
+	// e    f  .    f  e    .  .    f  .    f
+	//  gggg    ....    gggg    gggg    ....
+
+	//   5:      6:      7:      8:      9:
+	//  aaaa    aaaa    aaaa    aaaa    aaaa
+	// b    .  b    .  .    c  b    c  b    c
+	// b    .  b    .  .    c  b    c  b    c
+	//  dddd    dddd    ....    dddd    dddd
+	// .    f  e    f  .    f  e    f  .    f
+	// .    f  e    f  .    f  e    f  .    f
+	//  gggg    gggg    ....    gggg    gggg
+
+	//   0:      1:      2:      3:      4:
+	//  ....    ....    ....    ....    ....
+	// .    .  .    a  .    .  .    .  e    a
+	// .    .  .    a  .    .  .    .  e    a
+	//  ....    ....    ....    ....    ffff
+	// .    .  .    b  .    .  .    .  .    b
+	// .    .  .    b  .    .  .    .  .    b
+	//  ....    ....    ....    ....    ....
+
+	//   5:      6:      7:      8:      9:
+	//  ....    ....    dddd    dddd    ....
+	// .    .  .    .  .    a  e    a  .    .
+	// .    .  .    .  .    a  e    a  .    .
+	//  ....    ....    ....    ffff    ....
+	// .    .  .    .  .    b  g    b  .    .
+	// .    .  .    .  .    b  g    b  .    .
+	//  ....    ....    ....    cccc    ....
+
+	//  0
+	// 1 2
+	//  3
+	// 4 5
+	//  6
+
+	//  1
+	//  .
+	// . *
+	//  .
+	// . *
+	//  .
+
+	//  2
+	//  *
+	// . *
+	//  *
+	// * .
+	//  *
+
+	//  dddd
+	// e    a
+	// e    a
+	//  ffff
+	// g    b
+	// g    b
+	//  cccc
+
+	// 8       3     3      4
+	// acedgfa fbcad fbcad  eafb
+
+	// 8       3     3      4
+	// fdgacbe cefdb cefbgd gcbe
+
 	counts = map[int]int{
 		0: 0,
 		1: 0,
