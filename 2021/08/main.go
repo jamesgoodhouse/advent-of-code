@@ -132,6 +132,8 @@ var (
 	}
 
 	outputValues int
+
+	verbose = true
 )
 
 func main() {
@@ -172,14 +174,18 @@ func main() {
 		permIteration := 0
 
 		for k, p8 := range permsOf8 {
-			fmt.Printf("permutation %d — '%s'\n", permIteration, k)
+			if verbose {
+				fmt.Printf("permutation %d — '%s'\n", permIteration, k)
+			}
 			knownSegments[8] = k
 			segmentIterator := 0
 
 			for {
 				segment := segments[segmentIterator]
 
-				fmt.Printf("checking segement '%s'\n", segment)
+				if verbose {
+					fmt.Printf("checking segement '%s'\n", segment)
+				}
 
 				found := false
 
@@ -191,7 +197,9 @@ func main() {
 
 				for n, ns := range numberSegmentShapes {
 					if n != 8 && reflect.DeepEqual(ns, numberShape) && knownSegments[n] == "" {
-						fmt.Printf("match found for '%d'\n", n)
+						if verbose {
+							fmt.Printf("match found for '%d'\n", n)
+						}
 						knownSegments[n] = segment
 						found = true
 						break
@@ -201,8 +209,10 @@ func main() {
 				if found {
 					segmentIterator++
 				} else {
-					fmt.Printf("no match found for %s, starting over\n", segment)
-					fmt.Println("---------------------------")
+					if verbose {
+						fmt.Printf("no match found for %s, starting over\n", segment)
+						fmt.Println("---------------------------")
+					}
 					segmentIterator = 0
 					knownSegments = make([]string, 10)
 					break
@@ -214,10 +224,17 @@ func main() {
 				}
 			}
 			if allFound {
-				fmt.Println("found matches for all segments!")
+				if verbose {
+					fmt.Println("found matches for all segments!")
+				}
 				break
 			}
 			permIteration++
+		}
+
+		if !allFound {
+			fmt.Println("uh... nope")
+			os.Exit(0)
 		}
 
 		knownSegmentsNormalized := map[string]int{}
@@ -242,7 +259,7 @@ func main() {
 		outputValues += ov
 	}
 
-	fmt.Printf("\nsum: %d\n", outputValues)
+	fmt.Printf("sum: %d\n", outputValues)
 }
 
 // https://yourbasic.org/golang/generate-permutation-slice-string/
