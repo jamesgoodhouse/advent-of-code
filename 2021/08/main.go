@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"os"
 	"reflect"
+	"sort"
+	"strconv"
 	"strings"
 )
 
 const (
-	inputFile = "input3.txt"
+	inputFile = "input.txt"
 )
 
 // 8       5     2     3     7   9      6      4    0      1  | 5     3     5     3
@@ -128,6 +130,8 @@ var numberSegmentShapes = [][]bool{
 	{true, true, true, true, false, true, true},
 }
 
+var outputValues int
+
 func main() {
 	file, err := os.Open(inputFile)
 	if err != nil {
@@ -143,7 +147,7 @@ func main() {
 		segmentsRaw := strings.Split(t, " | ")
 
 		signalPatterns := strings.Fields(segmentsRaw[0])
-		// outputs := strings.Fields(segmentsRaw[1])
+		outputs := strings.Fields(segmentsRaw[1])
 
 		segments := []string{}
 		permsOf8 := map[string]map[string]int{}
@@ -164,16 +168,19 @@ func main() {
 		knownSegments := make([]string, 10)
 
 		segmentIterator := 0
+		allFound := false
 
-		fmt.Println(len(segments))
-		for {
-			segment := segments[segmentIterator]
+		for k, p8 := range permsOf8 {
+			// fmt.Printf("checking 8 permutation '%s'\n", k)
+			knownSegments[8] = k
 
-			fmt.Printf("checking segement '%s'\n", segment)
+			for {
+				segment := segments[segmentIterator]
 
-			found := false
+				// fmt.Printf("checking segement '%s'\n", segment)
 
-			for _, p8 := range permsOf8 {
+				found := false
+
 				numberShape := make([]bool, 7)
 
 				for _, s := range strings.Split(segment, "") {
@@ -182,32 +189,57 @@ func main() {
 
 				for n, ns := range numberSegmentShapes {
 					if n != 8 && reflect.DeepEqual(ns, numberShape) && knownSegments[n] == "" {
-						fmt.Printf("found match for '%d'\n", n)
+						// fmt.Printf("found match for '%d'\n", n)
 						knownSegments[n] = segment
 						found = true
 						break
 					}
 				}
+
 				if found {
-					// stop looking through permutations if match found
+					segmentIterator++
+				} else {
+					segmentIterator = 0
+					knownSegments = make([]string, 10)
+					break
+				}
+
+				if segmentIterator == 9 {
+					allFound = true
 					break
 				}
 			}
-			if !found {
-				segmentIterator = 0
-				knownSegments = make([]string, 10)
-			} else {
-				segmentIterator++
-			}
-
-			if segmentIterator == 9 {
+			if allFound {
 				break
 			}
 		}
 
-		fmt.Println(knownSegments)
+		knownSegmentsNormalized := map[string]int{}
+		for i, ks := range knownSegments {
+			sorted := strings.Split(ks, "")
+			sort.Strings(sorted)
+			knownSegmentsNormalized[strings.Join(sorted, "")] = i
+		}
+
+		var outputValue string
+		for _, o := range outputs {
+			sorted := strings.Split(o, "")
+			sort.Strings(sorted)
+			outputValue += strconv.Itoa(knownSegmentsNormalized[strings.Join(sorted, "")])
+		}
+
+		ov, err := strconv.Atoi(outputValue)
+		if err != nil {
+			panic(err)
+		}
+
+		outputValues += ov
 	}
+
+	fmt.Println(outputValues)
 }
+
+// https://yourbasic.org/golang/generate-permutation-slice-string/
 
 // Perm calls f with each permutation of a.
 func Perm(a []rune, f func([]rune)) {
