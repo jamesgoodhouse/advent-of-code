@@ -20,7 +20,7 @@ var (
 )
 
 type (
-	lanternfishes []int
+	lanternfishes []uint64
 )
 
 func main() {
@@ -35,7 +35,7 @@ func main() {
 	for scanner.Scan() {
 		text := scanner.Text()
 
-		fish = make([]int, defaultLanternfishTimer+1)
+		fish = make([]uint64, defaultLanternfishTimer+1)
 
 		for _, timerRaw := range strings.Split(text, ",") {
 			timer, err := strconv.Atoi(timerRaw)
@@ -51,19 +51,19 @@ func main() {
 	fmt.Printf("number of lanternfish: '%d'\n", fish.count())
 }
 
-func (lfs *lanternfishes) count() int {
-	count := 0
+func (lfs *lanternfishes) count() uint64 {
+	count := uint64(0)
 	for _, lf := range *lfs {
 		count += lf
 	}
 	return count
 }
 
-func (lf *lanternfishes) spawn() {
+func (lfs *lanternfishes) spawn() {
 	for day := 0; day < daysOfSpawning; day++ {
-		zeroFish := fish[0]
-		fish = fish[1:]
-		fish[lanternfishTimerReset] += zeroFish
-		fish = append(fish, zeroFish)
+		zeroFish := (*lfs)[0]
+		*lfs = (*lfs)[1:]
+		(*lfs)[lanternfishTimerReset] += zeroFish
+		*lfs = append(*lfs, zeroFish)
 	}
 }
