@@ -117,20 +117,22 @@ const (
 //  F
 // TFTFFTF
 
-var numberSegmentShapes = [][]bool{
-	{true, true, true, false, true, true, true},
-	{false, false, true, false, false, true, false},
-	{true, false, true, true, true, false, true},
-	{true, false, true, true, false, true, true},
-	{false, true, true, true, false, true, false},
-	{true, true, false, true, false, true, true},
-	{true, true, false, true, true, true, true},
-	{true, false, true, false, false, true, false},
-	{true, true, true, true, true, true, true},
-	{true, true, true, true, false, true, true},
-}
+var (
+	numberSegmentShapes = [][]bool{
+		{true, true, true, false, true, true, true},
+		{false, false, true, false, false, true, false},
+		{true, false, true, true, true, false, true},
+		{true, false, true, true, false, true, true},
+		{false, true, true, true, false, true, false},
+		{true, true, false, true, false, true, true},
+		{true, true, false, true, true, true, true},
+		{true, false, true, false, false, true, false},
+		{true, true, true, true, true, true, true},
+		{true, true, true, true, false, true, true},
+	}
 
-var outputValues int
+	outputValues int
+)
 
 func main() {
 	file, err := os.Open(inputFile)
@@ -166,18 +168,18 @@ func main() {
 		}
 
 		knownSegments := make([]string, 10)
-
-		segmentIterator := 0
 		allFound := false
+		permIteration := 0
 
 		for k, p8 := range permsOf8 {
-			// fmt.Printf("checking 8 permutation '%s'\n", k)
+			fmt.Printf("permutation %d — '%s'\n", permIteration, k)
 			knownSegments[8] = k
+			segmentIterator := 0
 
 			for {
 				segment := segments[segmentIterator]
 
-				// fmt.Printf("checking segement '%s'\n", segment)
+				fmt.Printf("checking segement '%s'\n", segment)
 
 				found := false
 
@@ -189,7 +191,7 @@ func main() {
 
 				for n, ns := range numberSegmentShapes {
 					if n != 8 && reflect.DeepEqual(ns, numberShape) && knownSegments[n] == "" {
-						// fmt.Printf("found match for '%d'\n", n)
+						fmt.Printf("match found for '%d'\n", n)
 						knownSegments[n] = segment
 						found = true
 						break
@@ -199,6 +201,8 @@ func main() {
 				if found {
 					segmentIterator++
 				} else {
+					fmt.Printf("no match found for %s, starting over\n", segment)
+					fmt.Println("---------------------------")
 					segmentIterator = 0
 					knownSegments = make([]string, 10)
 					break
@@ -210,8 +214,10 @@ func main() {
 				}
 			}
 			if allFound {
+				fmt.Println("found matches for all segments!")
 				break
 			}
+			permIteration++
 		}
 
 		knownSegmentsNormalized := map[string]int{}
@@ -236,7 +242,7 @@ func main() {
 		outputValues += ov
 	}
 
-	fmt.Println(outputValues)
+	fmt.Printf("\nsum: %d\n", outputValues)
 }
 
 // https://yourbasic.org/golang/generate-permutation-slice-string/
