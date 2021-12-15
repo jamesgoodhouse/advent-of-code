@@ -42,7 +42,7 @@ func main() {
 	}
 
 	charSet := []string{}
-	for char, _ := range charSetMap {
+	for char := range charSetMap {
 		charSet = append(charSet, char)
 	}
 
