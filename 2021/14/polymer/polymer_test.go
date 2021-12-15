@@ -26,39 +26,28 @@ func TestRunPairInsertionProcess(t *testing.T) {
 		"NH": {"NH", "C"},
 		"NN": {"NN", "C"},
 	}
-	charSet := []string{"B", "C", "H", "N"}
 	template := "NNCB"
 	pfo := polymer.NewFormulaOptimizer(template, rules)
 
 	testCases := map[string]struct {
-		count        int
-		numSteps     int
-		checkPolymer bool
-		polymer      *polymer.Polymer
+		count    int
+		numSteps int
 	}{
 		"single_step": {
-			count:        1,
-			numSteps:     1,
-			checkPolymer: true,
-			polymer:      polymer.New("NCNBCHB"),
+			count:    1,
+			numSteps: 1,
 		},
 		"two_steps": {
-			count:        5,
-			numSteps:     2,
-			checkPolymer: true,
-			polymer:      polymer.New("NBCCNBBBCBHCB"),
+			count:    5,
+			numSteps: 2,
 		},
 		"three_steps": {
-			count:        7,
-			numSteps:     3,
-			checkPolymer: true,
-			polymer:      polymer.New("NBBBCNCCNBBNBNBBCHBHHBCHB"),
+			count:    7,
+			numSteps: 3,
 		},
 		"four_steps": {
-			count:        18,
-			numSteps:     4,
-			checkPolymer: true,
-			polymer:      polymer.New("NBBNBNBBCCNBCNCCNBBNBBNBBBNBBNBBCBHCBHHNHCBBCBHCB"),
+			count:    18,
+			numSteps: 4,
 		},
 		"ten_steps": {
 			count:    1588,
@@ -69,12 +58,9 @@ func TestRunPairInsertionProcess(t *testing.T) {
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
 			polymer := pfo.RunPairInsertionProcess(tc.numSteps)
-			_, lc := polymer.LeastCommonElement(charSet)
-			_, mc := polymer.MostCommonElement(charSet)
+			_, lc := polymer.LeastCommonElement()
+			_, mc := polymer.MostCommonElement()
 			assert.Equal(t, tc.count, mc-lc)
-			if tc.checkPolymer {
-				assert.Equal(t, tc.polymer, polymer)
-			}
 		})
 	}
 }

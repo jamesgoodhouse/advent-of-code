@@ -24,7 +24,6 @@ func main() {
 
 	var template string
 	rules := map[string]*polymer.PairInsertionRule{}
-	charSetMap := map[string]bool{}
 
 	lineNum := 1
 	for scanner.Scan() {
@@ -35,20 +34,12 @@ func main() {
 			rules[rawRule[0]] = polymer.NewPairInsertionRule(rawRule[0], rawRule[1])
 		}
 		lineNum++
-
-		for _, char := range strings.Split(scanner.Text(), "") {
-			charSetMap[char] = true
-		}
-	}
-
-	charSet := []string{}
-	for char := range charSetMap {
-		charSet = append(charSet, char)
 	}
 
 	pfo := polymer.NewFormulaOptimizer(template, rules)
-	polymer := pfo.RunPairInsertionProcess(10)
-	_, lc := polymer.LeastCommonElement(charSet)
-	_, mc := polymer.MostCommonElement(charSet)
+	polymer := pfo.RunPairInsertionProcess(40)
+	_, lc := polymer.LeastCommonElement()
+	_, mc := polymer.MostCommonElement()
+
 	fmt.Println(mc - lc)
 }

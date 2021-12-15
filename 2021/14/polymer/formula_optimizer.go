@@ -1,7 +1,5 @@
 package polymer
 
-import "fmt"
-
 type (
 	PairInsertionRule struct {
 		Pair          string
@@ -28,22 +26,38 @@ func NewPairInsertionRule(pair, char string) *PairInsertionRule {
 
 func (pfo *FormulaOptimizer) RunPairInsertionProcess(numSteps int) *Polymer {
 	template := pfo.Template
+	counts := map[string]int{}
+	stepCounts := map[string]int{}
 
-	for step := 1; step <= numSteps; step++ {
-		stepTemplate := ""
-		for i := 0; i < len(template)-1; i++ {
-			pair := template[i : i+2]
-			charToInsert := pfo.PairInsertionRules[pair].InsertionChar
-			if i == 0 {
-				stepTemplate += pair[:1] + charToInsert + pair[1:]
-			} else {
-				stepTemplate += charToInsert + pair[1:]
-			}
-			fmt.Println(len(stepTemplate))
-		}
-		// fmt.Println(len(stepTemplate))
-		template = stepTemplate
+	charCount := map[string]int{}
+
+	for i := 0; i < len(template)-1; i++ {
+		pair := template[i : i+2]
+		counts[pair]++
+		stepCounts[pair]++
 	}
 
-	return New(template)
+	for i := 0; i < len(template); i++ {
+		charCount[string(template[i])]++
+	}
+
+	for step := 1; step <= numSteps; step++ {
+		for pair, count := range counts {
+			charToInsert := pfo.PairInsertionRules[pair].InsertionChar
+			charCount[charToInsert] += count
+			stepCounts[charToInsert+pair[1:]] += count
+			stepCounts[pair[:1]+charToInsert] += count
+			stepCounts[pair] -= count
+			if stepCounts[pair] <= 0 {
+				delete(stepCounts, pair)
+			}
+		}
+
+		counts = make(map[string]int)
+		for key, val := range stepCounts {
+			counts[key] = val
+		}
+	}
+
+	return New(charCount)
 }
