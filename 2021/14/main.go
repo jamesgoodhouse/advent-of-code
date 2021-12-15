@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"unicode"
 
 	"github.com/jamesgoodhouse/advent-of-code/2021/14/polymer"
 )
 
 const (
 	inputFile = "input.txt"
+	numSteps  = 10
 )
 
 func main() {
@@ -37,7 +39,9 @@ func main() {
 		lineNum++
 
 		for _, char := range strings.Split(scanner.Text(), "") {
-			charSetMap[char] = true
+			if unicode.IsLetter([]rune(char)[0]) {
+				charSetMap[char] = true
+			}
 		}
 	}
 
@@ -47,7 +51,7 @@ func main() {
 	}
 
 	pfo := polymer.NewFormulaOptimizer(template, rules)
-	polymer := pfo.RunPairInsertionProcess(10)
+	polymer := pfo.RunPairInsertionProcess(numSteps)
 	_, lc := polymer.LeastCommonElement(charSet)
 	_, mc := polymer.MostCommonElement(charSet)
 	fmt.Println(mc - lc)

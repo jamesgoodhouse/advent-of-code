@@ -1,7 +1,5 @@
 package polymer
 
-import "fmt"
-
 type (
 	PairInsertionRule struct {
 		Pair          string
@@ -39,7 +37,7 @@ func (pfo *FormulaOptimizer) RunPairInsertionProcess(numSteps int) *Polymer {
 			} else {
 				stepTemplate += charToInsert + pair[1:]
 			}
-			fmt.Println(len(stepTemplate))
+			// fmt.Println(len(stepTemplate))
 		}
 		// fmt.Println(len(stepTemplate))
 		template = stepTemplate
