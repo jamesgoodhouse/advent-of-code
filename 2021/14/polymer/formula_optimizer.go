@@ -9,7 +9,6 @@ type (
 	FormulaOptimizer struct {
 		PairInsertionRules map[string]*PairInsertionRule
 		Template           string
-		Polymer            *Polymer
 	}
 )
 
@@ -28,17 +27,16 @@ func (pfo *FormulaOptimizer) RunPairInsertionProcess(numSteps int) *Polymer {
 	template := pfo.Template
 	counts := map[string]int{}
 	stepCounts := map[string]int{}
-
 	charCount := map[string]int{}
-
-	for i := 0; i < len(template)-1; i++ {
-		pair := template[i : i+2]
-		counts[pair]++
-		stepCounts[pair]++
-	}
 
 	for i := 0; i < len(template); i++ {
 		charCount[string(template[i])]++
+
+		if i < len(template)-1 {
+			pair := template[i : i+2]
+			counts[pair]++
+			stepCounts[pair]++
+		}
 	}
 
 	for step := 1; step <= numSteps; step++ {
@@ -59,5 +57,5 @@ func (pfo *FormulaOptimizer) RunPairInsertionProcess(numSteps int) *Polymer {
 		}
 	}
 
-	return New(charCount)
+	return NewPolymer(charCount)
 }

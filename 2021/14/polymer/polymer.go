@@ -1,19 +1,20 @@
 package polymer
 
 type (
-	Polymer map[string]int
+	Polymer struct {
+		CharacterCounts map[string]int
+	}
 )
 
-func New(s map[string]int) *Polymer {
-	p := Polymer(s)
-	return &p
+func NewPolymer(c map[string]int) *Polymer {
+	return &Polymer{CharacterCounts: c}
 }
 
 func (p *Polymer) LeastCommonElement() (string, int) {
 	var leastCommonChar string
 	var leastCommonCount int
 
-	for char, count := range *p {
+	for char, count := range (*p).CharacterCounts {
 		if leastCommonCount == 0 || count < leastCommonCount {
 			leastCommonChar = char
 			leastCommonCount = count
@@ -26,7 +27,7 @@ func (p *Polymer) MostCommonElement() (string, int) {
 	var mostCommonChar string
 	var mostCommonCount int
 
-	for char, count := range *p {
+	for char, count := range (*p).CharacterCounts {
 		if count > mostCommonCount {
 			mostCommonCount = count
 			mostCommonChar = char
