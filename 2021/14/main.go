@@ -5,14 +5,13 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"unicode"
 
 	"github.com/jamesgoodhouse/advent-of-code/2021/14/polymer"
 )
 
 const (
 	inputFile = "input.txt"
-	numSteps  = 10
+	numSteps  = 40
 )
 
 func main() {
@@ -26,7 +25,6 @@ func main() {
 
 	var template string
 	rules := map[string]*polymer.PairInsertionRule{}
-	charSetMap := map[string]bool{}
 
 	lineNum := 1
 	for scanner.Scan() {
@@ -37,22 +35,12 @@ func main() {
 			rules[rawRule[0]] = polymer.NewPairInsertionRule(rawRule[0], rawRule[1])
 		}
 		lineNum++
-
-		for _, char := range strings.Split(scanner.Text(), "") {
-			if unicode.IsLetter([]rune(char)[0]) {
-				charSetMap[char] = true
-			}
-		}
-	}
-
-	charSet := []string{}
-	for char := range charSetMap {
-		charSet = append(charSet, char)
 	}
 
 	pfo := polymer.NewFormulaOptimizer(template, rules)
 	polymer := pfo.RunPairInsertionProcess(numSteps)
-	_, lc := polymer.LeastCommonElement(charSet)
-	_, mc := polymer.MostCommonElement(charSet)
+	_, lc := polymer.LeastCommonElement()
+	_, mc := polymer.MostCommonElement()
+
 	fmt.Println(mc - lc)
 }

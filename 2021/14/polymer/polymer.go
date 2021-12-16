@@ -1,23 +1,19 @@
 package polymer
 
-import (
-	"strings"
-)
-
 type (
-	Polymer string
+	Polymer map[string]int
 )
 
-func New(s string) *Polymer {
+func New(s map[string]int) *Polymer {
 	p := Polymer(s)
 	return &p
 }
 
-func (p *Polymer) LeastCommonElement(charSet []string) (string, int) {
+func (p *Polymer) LeastCommonElement() (string, int) {
 	var leastCommonChar string
 	var leastCommonCount int
 
-	for char, count := range p.CountCharacters(charSet) {
+	for char, count := range *p {
 		if leastCommonCount == 0 || count < leastCommonCount {
 			leastCommonChar = char
 			leastCommonCount = count
@@ -26,23 +22,16 @@ func (p *Polymer) LeastCommonElement(charSet []string) (string, int) {
 	return leastCommonChar, leastCommonCount
 }
 
-func (p *Polymer) MostCommonElement(charSet []string) (string, int) {
+func (p *Polymer) MostCommonElement() (string, int) {
 	var mostCommonChar string
 	var mostCommonCount int
 
-	for char, count := range p.CountCharacters(charSet) {
+	for char, count := range *p {
 		if count > mostCommonCount {
-			mostCommonChar = char
 			mostCommonCount = count
+			mostCommonChar = char
 		}
 	}
-	return mostCommonChar, mostCommonCount
-}
 
-func (p *Polymer) CountCharacters(charSet []string) map[string]int {
-	count := map[string]int{}
-	for _, char := range charSet {
-		count[char] = strings.Count(string(*p), char)
-	}
-	return count
+	return mostCommonChar, mostCommonCount
 }
