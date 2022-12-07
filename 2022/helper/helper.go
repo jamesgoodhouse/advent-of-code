@@ -5,14 +5,14 @@ import (
 	"os"
 )
 
-func NewFileScanner(filepath string) (*bufio.Scanner, *os.File, error) {
+func NewFileScanner(filepath string, splitFn bufio.SplitFunc) (*bufio.Scanner, *os.File, error) {
 	inputFile, err := os.Open(filepath)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	fileScanner := bufio.NewScanner(inputFile)
-	fileScanner.Split(bufio.ScanLines)
+	fileScanner.Split(splitFn)
 
 	return fileScanner, inputFile, nil
 }
