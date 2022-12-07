@@ -16,6 +16,9 @@ var (
 	currentDirKey = ""
 
 	dirSizes = map[string]int{}
+
+	spaceNeededForUpdate = 30000000
+	totalDiskSpace       = 70000000
 )
 
 func main() {
@@ -57,12 +60,24 @@ func main() {
 		}
 	}
 
+	freeSpace := totalDiskSpace - dirSizes["/"]
+	spaceToDelete := spaceNeededForUpdate - freeSpace
+
 	sum := 0
+	taco := 111111111111111111
 	for _, size := range dirSizes {
 		if size <= 100000 {
 			sum += size
 		}
+
+		if size >= spaceToDelete && size < taco {
+			taco = size
+		}
 	}
 
-	fmt.Println(sum)
+	fmt.Printf("sum of dirs <= 100000: %v\n", sum)
+	fmt.Printf("free space: %v\n", freeSpace)
+	fmt.Printf("space needed for update: %v\n", spaceToDelete)
+
+	fmt.Println(taco)
 }
