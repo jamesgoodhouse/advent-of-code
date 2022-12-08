@@ -27,7 +27,6 @@ func main() {
 	defer file.Close()
 
 	charCount := 0
-	foundStartOfMessage := false
 	foundStartOfPacket := false
 	messageMarker := ""
 	packetMarker := ""
@@ -35,38 +34,31 @@ func main() {
 	startOfPacketCharCount := 0
 
 	for scanner.Scan() {
-		if foundStartOfMessage && foundStartOfPacket {
-			break
-		}
-
 		charCount += 1
 		r := scanner.Text()
 
 		if !foundStartOfPacket {
 			packetMarker += r
-		}
 
-		if !foundStartOfPacket && len(packetMarker) == packetMarkerSize {
-			// check for all unique chars
-			if containsUnique(packetMarker) {
-				foundStartOfPacket = true
-				startOfPacketCharCount = charCount
-				fmt.Printf("packet marker '%v' found at '%v'\n", packetMarker, startOfPacketCharCount)
-				continue
+			if len(packetMarker) == packetMarkerSize {
+				// check for all unique chars
+				if containsUnique(packetMarker) {
+					foundStartOfPacket = true
+					startOfPacketCharCount = charCount
+					fmt.Printf("packet marker '%v' found at '%v'\n", packetMarker, startOfPacketCharCount)
+					continue
+				}
+
+				// if not full of unique chars, lop that first one off and move along
+				packetMarker = packetMarker[1:]
 			}
-
-			// if not full of unique chars, lop that first one off and move along
-			packetMarker = packetMarker[1:]
 		}
 
-		if !foundStartOfMessage {
-			messageMarker += r
-		}
+		messageMarker += r
 
-		if !foundStartOfMessage && len(messageMarker) == messageMarkerSize {
+		if len(messageMarker) == messageMarkerSize {
 			// check for all unique chars
 			if containsUnique(messageMarker) {
-				foundStartOfMessage = true
 				startOfMessageCharCount = charCount
 				fmt.Printf("message marker '%v' found at '%v'\n", messageMarker, startOfMessageCharCount)
 				continue
