@@ -2,17 +2,32 @@ package helper
 
 import (
 	"bufio"
+	"errors"
+	"fmt"
 	"os"
 )
 
-func NewFileScanner(filepath string, splitFn bufio.SplitFunc) (*bufio.Scanner, *os.File, error) {
-	inputFile, err := os.Open(filepath)
+func HandleError(err error) {
 	if err != nil {
-		return nil, nil, err
+		fmt.Println(err)
+		os.Exit(1)
 	}
+}
 
-	fileScanner := bufio.NewScanner(inputFile)
-	fileScanner.Split(splitFn)
+func LoadFileFromArgs(args []string) (*os.File, error) {
+	if len(args[1:]) > 1 {
+		return nil, errors.New("too many args given")
+	} else if len(args[1:]) != 1 {
+		return nil, errors.New("no input file given")
+	}
+	return os.Open(args[1])
+}
 
-	return fileScanner, inputFile, nil
+func NewFileScanner(file *os.File, splitFunc bufio.SplitFunc) (*bufio.Scanner, error) {
+	if file == nil {
+		return nil, errors.New("file cannot be nil")
+	}
+	fileScanner := bufio.NewScanner(file)
+	fileScanner.Split(splitFunc)
+	return fileScanner, nil
 }
