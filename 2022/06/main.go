@@ -51,6 +51,7 @@ func main() {
 			if containsUnique(packetMarker) {
 				foundStartOfPacket = true
 				startOfPacketCharCount = charCount
+				fmt.Printf("packet marker '%v' found at '%v'\n", packetMarker, startOfPacketCharCount)
 				continue
 			}
 
@@ -67,6 +68,7 @@ func main() {
 			if containsUnique(messageMarker) {
 				foundStartOfMessage = true
 				startOfMessageCharCount = charCount
+				fmt.Printf("message marker '%v' found at '%v'\n", messageMarker, startOfMessageCharCount)
 				continue
 			}
 
@@ -74,12 +76,6 @@ func main() {
 			messageMarker = messageMarker[1:]
 		}
 	}
-
-	fmt.Println(startOfPacketCharCount)
-	fmt.Println(packetMarker)
-	fmt.Println("------")
-	fmt.Println(startOfMessageCharCount)
-	fmt.Println(messageMarker)
 }
 
 func containsUnique(s string) bool {
