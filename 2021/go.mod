@@ -18,6 +18,6 @@ require (
 	github.com/juliangruber/go-intersect v1.1.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	gopkg.in/neurosnap/sentences.v1 v1.0.6 // indirect
-	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c // indirect
+	gopkg.in/yaml.v3 v3.0.0 // indirect
 	k8s.io/client-go v11.0.0+incompatible // indirect
 )
